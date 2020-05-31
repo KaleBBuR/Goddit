@@ -31,7 +31,7 @@ func OAuthLoginSession(username string, password string, useragent string, clien
 
 	req, err := http.NewRequest(POST, tokenURL, bytes.NewBufferString(formData.Encode()))
 	if err != nil {
-		return &Session{}, errors.New(fmt.Sprintf("HTTP Request error. URL: %s\nMethod:%s\nHost:%s\n", req.URL, req.Method, req.Host))
+		return nil, errors.New(fmt.Sprintf("HTTP Request error. URL: %s\nMethod:%s\nHost:%s\n", req.URL, req.Method, req.Host))
 	}
 
 	req.Header.Set("User-Agent", useragent)
@@ -41,7 +41,7 @@ func OAuthLoginSession(username string, password string, useragent string, clien
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return &Session{}, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -49,11 +49,11 @@ func OAuthLoginSession(username string, password string, useragent string, clien
 	if resp.StatusCode != http.StatusOK {
 		error_string := fmt.Sprintf("HTTP ERROR\nStatus Code: %d\nError: %s", resp.StatusCode, resp.Status)
 		if resp.StatusCode == 429 {
-			return &Session{}, errors.New(error_string + "\nPossible Fix: Make sure you have a unique user agent.")
+			return nil, errors.New(error_string + "\nPossible Fix: Make sure you have a unique user agent.")
 		} else if resp.StatusCode == 401 {
-			return &Session{}, errors.New(error_string + "\nPossible Fix: Check to make sure your client ID and client Secret are both correct.")
+			return nil, errors.New(error_string + "\nPossible Fix: Check to make sure your client ID and client Secret are both correct.")
 		} else {
-			return &Session{}, errors.New(error_string)
+			return nil, errors.New(error_string)
 		}
 	}
 
@@ -70,7 +70,7 @@ func OAuthLoginSession(username string, password string, useragent string, clien
 		session.expiretime = expiretime.(float64)
 		go session.ExpireTimeCountdown()
 	} else {
-		return &Session{}, errors.New(fmt.Sprintf("Cannot get Access Token Error: %s\nPossible Fix: Make sure Username and Password are correct.", oauthjson["error"]))
+		return nil, errors.New(fmt.Sprintf("Cannot get Access Token Error: %s\nPossible Fix: Make sure Username and Password are correct.", oauthjson["error"]))
 	}
 
 	return session, nil
