@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	goddit ".."
+	goddit "github.com/KaleBBuR/Goddit"
 )
 
 var AllComments []goddit.Comment
