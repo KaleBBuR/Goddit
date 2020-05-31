@@ -20,7 +20,7 @@ func (sess *Session) SubredditData(subreddit string) (*Subreddit, error) {
 	return &basesubredditjson.Data, nil
 }
 
-func (sess *Session) SubredditRules(subreddit string, ruleParams map[string]interface{}) (*[]Rule, error) {
+func (sess *Session) SubredditRules(subreddit string, ruleParams map[string]interface{}) ([]Rule, error) {
 	rulesURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, aboutRulesEnding)
 	req, RequestErr := RedditAPIRequest(GET, rulesURL, nil)
 	if RequestErr != nil {
@@ -34,10 +34,10 @@ func (sess *Session) SubredditRules(subreddit string, ruleParams map[string]inte
 		return nil, ResponseErr
 	}
 
-	return &getRules.Rules, nil
+	return getRules.Rules, nil
 }
 
-func (sess *Session) Moderators(subreddit string, modParams map[string]interface{}) (*[]Moderator, error) {
+func (sess *Session) Moderators(subreddit string, modParams map[string]interface{}) ([]Moderator, error) {
 	possibleSubModParams := []string{"after", "before", "count", "limit", "show", "sr_detail", "user"}
 
 	for key, _ := range modParams {
@@ -61,7 +61,7 @@ func (sess *Session) Moderators(subreddit string, modParams map[string]interface
 		return nil, ResponseErr
 	}
 
-	return &getMods.Data.Mods, nil
+	return getMods.Data.Mods, nil
 }
 
 func (sess *Session) Subscribe(a interface{}, subscribeParams map[string]interface{}) error {

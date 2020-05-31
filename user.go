@@ -21,7 +21,7 @@ func (sess *Session) UserAbout(user string) (*User, error) {
 	return &userAboutJson.Data, nil
 }
 
-func (sess *Session) UserTrophies(user string) (*[]Trophie, error) {
+func (sess *Session) UserTrophies(user string) ([]Trophie, error) {
 	userTrophiesURL := fmt.Sprintf("%s/%s%s", User2URL, user, trophiesEnding)
 	req, RequestErr := RedditAPIRequest(GET, userTrophiesURL, nil)
 	if RequestErr != nil {
@@ -39,17 +39,17 @@ func (sess *Session) UserTrophies(user string) (*[]Trophie, error) {
 		trophies = append(trophies, trophieObject.Data)
 	}
 
-	return &trophies, nil
+	return trophies, nil
 }
 
-func (sess *Session) UserFriends(user string) (*[]FriendData, error) {
+func (sess *Session) UserFriends(user string) ([]FriendData, error) {
 	userFriendsURL := fmt.Sprintf("%s/%s", UserFriendsBeginning, user)
 	req, RequestErr := RedditAPIRequest(GET, userFriendsURL, nil)
 	if RequestErr != nil {
 		return nil, RequestErr
 	}
 
-	friends := &[]FriendData{}
+	friends := []FriendData{}
 	ResponseErr := sess.RedditAPIResponse(req, friends)
 
 	if ResponseErr != nil {
@@ -59,7 +59,7 @@ func (sess *Session) UserFriends(user string) (*[]FriendData, error) {
 	return friends, nil
 }
 
-func (sess *Session) UserComments(user string) (*[]Comment, error) {
+func (sess *Session) UserComments(user string) ([]Comment, error) {
 	userCommentsURL := fmt.Sprintf("%s/%s%s", UserURL, user, commentsEnding)
 	req, RequestErr := RedditAPIRequest(GET, userCommentsURL, nil)
 	if RequestErr != nil {
@@ -75,13 +75,13 @@ func (sess *Session) UserComments(user string) (*[]Comment, error) {
 
 	comments := []Comment{}
 	for _, commentStruct := range commentData.Data.Children {
-		comments = append(comments, commentStruct.Data)
+		comments = append(comments, commentStruct.CommentData)
 	}
 
-	return &comments, nil
+	return comments, nil
 }
 
-func (sess *Session) UserPosts(user string) (*[]Submission, error) {
+func (sess *Session) UserPosts(user string) ([]Submission, error) {
 	userPostsURL := fmt.Sprintf("%s/%s%s", UserURL, user, postsEnding)
 	req, RequestErr := RedditAPIRequest(GET, userPostsURL, nil)
 	if RequestErr != nil {
@@ -100,7 +100,7 @@ func (sess *Session) UserPosts(user string) (*[]Submission, error) {
 		submissions = append(submissions, submissionData.Data)
 	}
 
-	return &submissions, nil
+	return submissions, nil
 }
 
 // func (sess *Session) upvoted() {

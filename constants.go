@@ -259,17 +259,20 @@ type GetPostedComment struct {
 		Errors []string `json:"errors"`
 		Data   struct {
 			Things []struct {
-				Kind string  `json:"kind"`
-				Data Comment `json:"data"`
+				Kind        string  `json:"kind"`
+				CommentData Comment `json:"data"`
 			} `json:"things"`
 		} `json:"data"`
 	} `json:"json"`
 }
 
 type GetCommentJSON struct {
+	Kind string `json:"kind"`
 	Data struct {
+		Modhash  string `json:"modhash"`
+		Dist     int    `json:"dist"`
 		Children []struct {
-			Data Comment `json:"data"`
+			CommentData Comment `json:"data"`
 		} `json:"children"`
 	} `json:"data"`
 }
@@ -366,9 +369,10 @@ func (sess *Session) RedditAPIResponse(request *http.Request, a interface{}) err
 		return err
 	}
 
-	bodyString := string(body)
+	// b, _ := printJSON(body)
+	// fmt.Printf("%s", b)
 
-	if JSONerr := json.Unmarshal([]byte(bodyString), a); JSONerr != nil && a != nil {
+	if JSONerr := json.Unmarshal(body, a); JSONerr != nil && a != nil {
 		return err
 	}
 
@@ -391,6 +395,12 @@ func contains(strArr []string, key string) bool {
 	}
 
 	return false
+}
+
+func printJSON(b []byte) ([]byte, error) {
+	var out bytes.Buffer
+	err := json.Indent(&out, b, "", "	")
+	return out.Bytes(), err
 }
 
 func addParams(url string, params map[string]interface{}) string {

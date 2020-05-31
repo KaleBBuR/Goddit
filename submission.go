@@ -4,22 +4,22 @@ import (
 	"fmt"
 )
 
-func (sess *Session) GetSubmission(url string) (Submission, error) {
+func (sess *Session) GetSubmission(url string) (*Submission, error) {
 	req, RequestErr := RedditAPIRequest(GET, url, nil)
 	if RequestErr != nil {
-		return Submission{}, RequestErr
+		return nil, RequestErr
 	}
 
 	submissionsStruct := &GetSubmission{}
 	ResponseErr := sess.RedditAPIResponse(req, &submissionsStruct)
 	if ResponseErr != nil {
-		return Submission{}, ResponseErr
+		return nil, ResponseErr
 	}
 
-	return submissionsStruct.Data.Children[0].Data, nil
+	return &submissionsStruct.Data.Children[0].Data, nil
 }
 
-func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParams map[string]interface{}) (*[]Submission, error) {
+func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParams map[string]interface{}) ([]Submission, error) {
 	sorts := []string{"hot", "new", "top", "random", "rising", "controversial"}
 	baseParams := []string{"after", "before", "count", "limit", "show", "sr_detail"}
 	sortParams := make(map[string][]string)
@@ -64,14 +64,14 @@ func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParam
 			submissions = append(submissions, children.Data)
 		}
 
-		return &submissions, nil
+		return submissions, nil
 
 	} else {
 		panic("You must have some kind of sort.")
 	}
 }
 
-func (sess *Session) SearchSubmissions(subreddit string, optionalParams map[string]interface{}) (*[]Submission, error) {
+func (sess *Session) SearchSubmissions(subreddit string, optionalParams map[string]interface{}) ([]Submission, error) {
 	allOptionalParams := []string{"after", "before", "category", "count", "include_facets", "limit", "q", "restrict_sr", "show", "sr_detail", "t", "type"}
 	for key, _ := range optionalParams {
 		if !contains(allOptionalParams, key) {
@@ -100,7 +100,7 @@ func (sess *Session) SearchSubmissions(subreddit string, optionalParams map[stri
 		submissions = append(submissions, submission.Data)
 	}
 
-	return &submissions, nil
+	return submissions, nil
 }
 
 /*

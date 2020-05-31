@@ -30,7 +30,7 @@ func (sess *Session) MyPrefs() (*MePrefs, error) {
 	return mePrefs, nil
 }
 
-func (sess *Session) MyKarma() (*[]KarmaData, error) {
+func (sess *Session) MyKarma() ([]KarmaData, error) {
 	req, RequestErr := RedditAPIRequest(GET, MeKarmaURL, nil)
 
 	if RequestErr != nil {
@@ -48,10 +48,10 @@ func (sess *Session) MyKarma() (*[]KarmaData, error) {
 		karmaData = append(karmaData, karmadatastruct)
 	}
 
-	return &karmaData, nil
+	return karmaData, nil
 }
 
-func (sess *Session) MyTrophies() (*[]Trophie, error) {
+func (sess *Session) MyTrophies() ([]Trophie, error) {
 	req, RequestErr := RedditAPIRequest(GET, MeTrophieURL, nil)
 
 	if RequestErr != nil {
@@ -69,5 +69,5 @@ func (sess *Session) MyTrophies() (*[]Trophie, error) {
 		trophies = append(trophies, trophieget.Data)
 	}
 
-	return &trophies, nil
+	return trophies, nil
 }

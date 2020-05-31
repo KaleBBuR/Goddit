@@ -7,7 +7,7 @@ import (
 func GetReplies(c Comment) []Comment {
 	replies := []Comment{}
 	for _, replydata := range c.Replies.Data.Children {
-		replies = append(replies, replydata.Data)
+		replies = append(replies, replydata.CommentData)
 	}
 
 	return replies
@@ -23,7 +23,7 @@ func Replied(c Comment, username string) bool {
 	return false
 }
 
-func (sess *Session) GetComments(submission Submission) (*[]Comment, error) {
+func (sess *Session) GetComments(submission Submission) ([]Comment, error) {
 	commentURL := baseURL + submission.Permalink
 	req, RequestErr := RedditAPIRequest(GET, commentURL, nil)
 
@@ -31,19 +31,21 @@ func (sess *Session) GetComments(submission Submission) (*[]Comment, error) {
 		return nil, RequestErr
 	}
 
-	commentJSON := &GetCommentJSON{}
-	ResponseErr := sess.RedditAPIResponse(req, commentJSON)
+	commentJSON := []GetCommentJSON{}
+	ResponseErr := sess.RedditAPIResponse(req, &commentJSON)
 
 	if ResponseErr != nil {
 		return nil, ResponseErr
 	}
 
 	comments := []Comment{}
-	for _, comment := range commentJSON.Data.Children {
-		comments = append(comments, comment.Data)
+	for _, commentData := range commentJSON {
+		for _, comment := range commentData.Data.Children {
+			comments = append(comments, comment.CommentData)
+		}
 	}
 
-	return &comments, nil
+	return comments, nil
 }
 
 func (sess *Session) Reply(c Comment, replyParams map[string]interface{}) (*Comment, error) {
@@ -75,7 +77,7 @@ func (sess *Session) Reply(c Comment, replyParams map[string]interface{}) (*Comm
 
 	comment := Comment{}
 	for _, commentdata := range postedComment.JSON.Data.Things {
-		comment = commentdata.Data
+		comment = commentdata.CommentData
 		break
 	}
 
@@ -111,7 +113,7 @@ func (sess *Session) Comment(sub Submission, commentParams map[string]interface{
 
 	var comment Comment
 	for _, commentdata := range postedComment.JSON.Data.Things {
-		comment = commentdata.Data
+		comment = commentdata.CommentData
 	}
 
 	return &comment, nil

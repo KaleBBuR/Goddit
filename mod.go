@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (sess *Session) ModLog(subreddit string, modParams map[string]interface{}) (*[]ModLog, error) {
+func (sess *Session) ModLog(subreddit string, modParams map[string]interface{}) ([]ModLog, error) {
 	allModLogParams := []string{"after", "before", "count", "limit", "mod", "show", "sr_detail", "type"}
 	for key, _ := range modParams {
 		if !contains(allModLogParams, key) {
@@ -31,7 +31,7 @@ func (sess *Session) ModLog(subreddit string, modParams map[string]interface{}) 
 		modLog = append(modLog, modLogObject.Data)
 	}
 
-	return &modLog, nil
+	return modLog, nil
 }
 
 func (sess *Session) Approve(a interface{}) error {
