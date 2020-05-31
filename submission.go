@@ -277,7 +277,7 @@ func (sess *Session) Save(a interface{}, saveParams map[string]interface{}) erro
 	return nil
 }
 
-func (sess *Session) setSubredditSticky(a interface{}, stickyParams map[string]interface{}) error {
+func (sess *Session) SetSubredditSticky(a interface{}, stickyParams map[string]interface{}) error {
 	possibleSubStickyParams := []string{"api_type", "num", "state", "to_profile"}
 	for key, _ := range stickyParams {
 		if !contains(possibleSubStickyParams, key) {
