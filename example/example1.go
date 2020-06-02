@@ -70,10 +70,12 @@ func main() {
 					}
 				}
 			}
+		} else {
+			fmt.Printf("%s", submissionErr)
 		}
 	}
 
-	fmt.Println(len(AllComments))
+	fmt.Printf("\n%d\n", len(AllComments))
 
 	elapsed := time.Since(start)
 	log.Printf("Binomial took %s\n", elapsed)
