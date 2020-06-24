@@ -40,7 +40,7 @@ func (sess *Session) SubredditRules(subreddit string, ruleParams map[string]inte
 func (sess *Session) Moderators(subreddit string, modParams map[string]interface{}) ([]Moderator, error) {
 	possibleSubModParams := []string{"after", "before", "count", "limit", "show", "sr_detail", "user"}
 
-	for key, _ := range modParams {
+	for key := range modParams {
 		if !contains(possibleSubModParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -66,7 +66,7 @@ func (sess *Session) Moderators(subreddit string, modParams map[string]interface
 
 func (sess *Session) Subscribe(a interface{}, subscribeParams map[string]interface{}) error {
 	possibleSubscribeParams := []string{"action", "skip_initial_defaults"}
-	for key, _ := range subscribeParams {
+	for key := range subscribeParams {
 		if !contains(possibleSubscribeParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}

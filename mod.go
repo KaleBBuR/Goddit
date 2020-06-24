@@ -6,7 +6,7 @@ import (
 
 func (sess *Session) ModLog(subreddit string, modParams map[string]interface{}) ([]ModLog, error) {
 	allModLogParams := []string{"after", "before", "count", "limit", "mod", "show", "sr_detail", "type"}
-	for key, _ := range modParams {
+	for key := range modParams {
 		if !contains(allModLogParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}

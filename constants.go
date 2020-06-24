@@ -420,7 +420,6 @@ func addParams(url string, params map[string]interface{}) string {
 	}
 
 	url = strings.TrimSuffix(url, "&")
-	fmt.Printf("\n%s\n", url)
 	return url
 }
 

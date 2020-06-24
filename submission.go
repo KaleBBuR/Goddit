@@ -36,7 +36,7 @@ func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParam
 		}
 
 		if params, ok := sortParams[sort]; ok {
-			for key, _ := range optionalParams {
+			for key := range optionalParams {
 				if !contains(params, key) {
 					panic(fmt.Sprintf("This is not a valid parameter -> %s", key))
 				}
@@ -73,7 +73,7 @@ func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParam
 
 func (sess *Session) SearchSubmissions(subreddit string, optionalParams map[string]interface{}) ([]Submission, error) {
 	allOptionalParams := []string{"after", "before", "category", "count", "include_facets", "limit", "q", "restrict_sr", "show", "sr_detail", "t", "type"}
-	for key, _ := range optionalParams {
+	for key := range optionalParams {
 		if !contains(allOptionalParams, key) {
 			panic(fmt.Sprintf("Invalid key for searching submissions -> %s", key))
 		}
@@ -189,7 +189,7 @@ func (sess *Session) MarkNSFW(a interface{}) error {
 func (sess *Session) Report(a interface{}, reportParams map[string]interface{}) error {
 	possibleReportParams := []string{"additional_info", "api_type", "custom_text", "from_help_desk", "from_modmail", "modmail_conv_id", "other_reason", "reason", "rule_reason", "site_reason", "sr_name", "thing_id", "usernames"}
 
-	for key, _ := range reportParams {
+	for key := range reportParams {
 		if !contains(possibleReportParams, key) {
 			panic(fmt.Sprintf("Unusuable Parameter -> %s", key))
 		}
@@ -231,7 +231,7 @@ func (sess *Session) Delete(a interface{}) error {
 
 func (sess *Session) Edit(a interface{}, editParams map[string]interface{}) error {
 	possibleEditParams := []string{"api_type", "return_rtjson", "richtext_json", "text"}
-	for key, _ := range editParams {
+	for key := range editParams {
 		if !contains(possibleEditParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -256,7 +256,7 @@ func (sess *Session) Edit(a interface{}, editParams map[string]interface{}) erro
 func (sess *Session) Save(a interface{}, saveParams map[string]interface{}) error {
 	possibleSaveParam := "category"
 
-	for key, _ := range saveParams {
+	for key := range saveParams {
 		if key != possibleSaveParam {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -279,7 +279,7 @@ func (sess *Session) Save(a interface{}, saveParams map[string]interface{}) erro
 
 func (sess *Session) SetSubredditSticky(a interface{}, stickyParams map[string]interface{}) error {
 	possibleSubStickyParams := []string{"api_type", "num", "state", "to_profile"}
-	for key, _ := range stickyParams {
+	for key := range stickyParams {
 		if !contains(possibleSubStickyParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -305,7 +305,7 @@ func (sess *Session) SetSuggestedSort(a interface{}, setSuggSortParams map[strin
 	possibleSetSuggSortParams := []string{"api_type", "sort"}
 	setSuggSortParams["id"] = sess.getFullID(a)
 
-	for key, _ := range setSuggSortParams {
+	for key := range setSuggSortParams {
 		if !contains(possibleSetSuggSortParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -365,7 +365,7 @@ func (sess *Session) StoreVists(links string) error {
 
 func (sess *Session) Post(postParams map[string]interface{}) error {
 	possibleSubmitParams := []string{"ad", "api_type", "app", "collection_id", "event_end", "event_start", "event_tz", "extension", "flair_id", "flair_text", "g-recaptcha-response", "kind", "nsfw", "resubmit", "richtext_json", "sendreplies", "spoiler", "sr", "text", "title", "url", "video_poster_url"}
-	for key, _ := range postParams {
+	for key := range postParams {
 		if !contains(possibleSubmitParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}

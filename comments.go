@@ -50,7 +50,7 @@ func (sess *Session) GetComments(submission Submission) ([]Comment, error) {
 
 func (sess *Session) Reply(c Comment, replyParams map[string]interface{}) (*Comment, error) {
 	allReplyParams := []string{"api_type", "return_rtjson", "richtext_json", "text"}
-	for key, _ := range replyParams {
+	for key := range replyParams {
 		if !contains(allReplyParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
@@ -86,7 +86,7 @@ func (sess *Session) Reply(c Comment, replyParams map[string]interface{}) (*Comm
 
 func (sess *Session) Comment(sub Submission, commentParams map[string]interface{}) (*Comment, error) {
 	allCommentParams := []string{"api_type", "return_rtjson", "richtext_json", "text"}
-	for key, _ := range commentParams {
+	for key := range commentParams {
 		if !contains(allCommentParams, key) {
 			panic(fmt.Sprintf("Unusable Parameter -> %s", key))
 		}
