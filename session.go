@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -82,20 +81,23 @@ func (sess *Session) ExpireTimeCountdown() {
 		time.Sleep(time.Second)
 		expireTime -= 1
 		if expireTime == 0 {
-			session, err := OAuthLoginSession(
-				sess.username,
-				sess.password,
-				sess.useragent,
-				sess.clientID,
-				sess.clientSecret,
-			)
+			for {
+				session, err := OAuthLoginSession(
+					sess.username,
+					sess.password,
+					sess.useragent,
+					sess.clientID,
+					sess.clientSecret,
+				)
 
-			if err != nil {
-				log.Fatal(errors.New("Couldn't get new access token."))
+				if err != nil {
+					continue
+				} else {
+					sess.accesstoken = session.accesstoken
+					sess.ExpireTimeCountdown()
+					break
+				}
 			}
-
-			sess.accesstoken = session.accesstoken
-			sess.ExpireTimeCountdown()
 		}
 	}
 }
