@@ -6,32 +6,21 @@ import (
 
 func (sess *Session) SubredditData(subreddit string) (*Subreddit, error) {
 	subredditAboutURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, aboutEnding)
-	req, RequestErr := RedditAPIRequest(GET, subredditAboutURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var getSubredditData GetSubredditData
+	dataErr := sess.GetResponse(subredditAboutURL, GET, nil, &getSubredditData)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	basesubredditjson := &GetSubredditData{}
-	ResponseErr := sess.RedditAPIResponse(req, basesubredditjson)
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return &basesubredditjson.Data, nil
+	return &getSubredditData.Data, nil
 }
 
 func (sess *Session) SubredditRules(subreddit string, ruleParams map[string]interface{}) ([]Rule, error) {
 	rulesURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, aboutRulesEnding)
-	req, RequestErr := RedditAPIRequest(GET, rulesURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	getRules := &GetRules{}
-	ResponseErr := sess.RedditAPIResponse(req, getRules)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getRules GetRules
+	dataErr := sess.GetResponse(rulesURL, GET, nil, &getRules)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	return getRules.Rules, nil
@@ -48,20 +37,13 @@ func (sess *Session) Moderators(subreddit string, modParams map[string]interface
 
 	moderatorsURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, aboutModsEnding)
 	moderatorsURL = addParams(moderatorsURL, modParams)
-
-	req, RequestErr := RedditAPIRequest(GET, moderatorsURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var getModerators GetModerators
+	dataErr := sess.GetResponse(moderatorsURL, GET, nil, &getModerators)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	getMods := &GetModerators{}
-
-	ResponseErr := sess.RedditAPIResponse(req, getMods)
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return getMods.Data.Mods, nil
+	return getModerators.Data.Mods, nil
 }
 
 func (sess *Session) Subscribe(a interface{}, subscribeParams map[string]interface{}) error {
@@ -82,15 +64,9 @@ func (sess *Session) Subscribe(a interface{}, subscribeParams map[string]interfa
 	}
 
 	subscribeParamURL := addParams(subscribeURL, subscribeParams)
-
-	req, RequestErr := RedditAPIRequest(POST, subscribeParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(subscribeParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil

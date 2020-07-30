@@ -25,21 +25,14 @@ func Replied(c Comment, username string) bool {
 
 func (sess *Session) GetComments(submission Submission) ([]Comment, error) {
 	commentURL := baseURL + submission.Permalink
-	req, RequestErr := RedditAPIRequest(GET, commentURL, nil)
-
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	commentJSON := []GetCommentJSON{}
-	ResponseErr := sess.RedditAPIResponse(req, &commentJSON)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getCommentJSON []GetCommentJSON
+	dataErr := sess.GetResponse(commentURL, GET, nil, getCommentJSON)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	comments := []Comment{}
-	for _, commentData := range commentJSON {
+	for _, commentData := range getCommentJSON {
 		for _, comment := range commentData.Data.Children {
 			comments = append(comments, comment.CommentData)
 		}
@@ -61,22 +54,14 @@ func (sess *Session) Reply(c Comment, replyParams map[string]interface{}) (*Comm
 	}
 
 	replyURL := addParams(commentURL, replyParams)
-
-	req, RequestErr := RedditAPIRequest(POST, replyURL, nil)
-
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	postedComment := &GetPostedComment{}
-	ResponseErr := sess.RedditAPIResponse(req, postedComment)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getPostedComment GetPostedComment
+	dataErr := sess.GetResponse(replyURL, POST, nil, &getPostedComment)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	comment := Comment{}
-	for _, commentdata := range postedComment.JSON.Data.Things {
+	for _, commentdata := range getPostedComment.JSON.Data.Things {
 		comment = commentdata.CommentData
 		break
 	}
@@ -97,22 +82,14 @@ func (sess *Session) Comment(sub Submission, commentParams map[string]interface{
 	}
 
 	commentParamURL := addParams(commentURL, commentParams)
-
-	req, RequestErr := RedditAPIRequest(POST, commentParamURL, nil)
-
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	postedComment := &GetPostedComment{}
-	ResponseErr := sess.RedditAPIResponse(req, postedComment)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getPostedComment GetPostedComment
+	dataErr := sess.GetResponse(commentParamURL, POST, nil, &getPostedComment)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	var comment Comment
-	for _, commentdata := range postedComment.JSON.Data.Things {
+	for _, commentdata := range getPostedComment.JSON.Data.Things {
 		comment = commentdata.CommentData
 	}
 

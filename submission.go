@@ -5,18 +5,13 @@ import (
 )
 
 func (sess *Session) GetSubmission(url string) (*Submission, error) {
-	req, RequestErr := RedditAPIRequest(GET, url, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var getSubmission GetSubmission
+	dataErr := sess.GetResponse(url, GET, nil, &getSubmission)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	submissionsStruct := &GetSubmission{}
-	ResponseErr := sess.RedditAPIResponse(req, &submissionsStruct)
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return &submissionsStruct.Data.Children[0].Data, nil
+	return &getSubmission.Data.Children[0].Data, nil
 }
 
 func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParams map[string]interface{}) ([]Submission, error) {
@@ -46,21 +41,15 @@ func (sess *Session) GetSubmissions(subreddit string, sort string, optionalParam
 		url := fmt.Sprintf("%s/%s/%s.json", SubredditURL, subreddit, sort)
 		url = addParams(url, optionalParams)
 
-		req, RequestErr := RedditAPIRequest(GET, url, nil)
-		if RequestErr != nil {
-			return nil, RequestErr
-		}
-
-		submissionsStruct := &GetSubmission{}
-		ResponseErr := sess.RedditAPIResponse(req, submissionsStruct)
-
-		if ResponseErr != nil {
-			return nil, ResponseErr
+		var getSubmission GetSubmission
+		dataErr := sess.GetResponse(url, GET, nil, &getSubmission)
+		if dataErr != nil {
+			return nil, dataErr
 		}
 
 		submissions := []Submission{}
 
-		for _, children := range submissionsStruct.Data.Children {
+		for _, children := range getSubmission.Data.Children {
 			submissions = append(submissions, children.Data)
 		}
 
@@ -81,22 +70,14 @@ func (sess *Session) SearchSubmissions(subreddit string, optionalParams map[stri
 
 	URL := fmt.Sprintf("%s/%s/search.json", SubredditURL, subreddit)
 	URL = addParams(URL, optionalParams)
-
-	req, RequestErr := RedditAPIRequest(GET, URL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var getSubmission GetSubmission
+	dataErr := sess.GetResponse(URL, GET, nil, &getSubmission)
+	if dataErr != nil {
+		return nil, dataErr
 	}
-
-	submissionsStruct := &GetSubmission{}
-	ResponseErr := sess.RedditAPIResponse(req, submissionsStruct)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
 	submissions := []Submission{}
 
-	for _, submission := range submissionsStruct.Data.Children {
+	for _, submission := range getSubmission.Data.Children {
 		submissions = append(submissions, submission.Data)
 	}
 
@@ -138,15 +119,9 @@ func (sess *Session) Hide(a interface{}) error {
 	hideParams := make(map[string]interface{})
 	hideParams["id"] = sess.getFullID(a)
 	hideURL := addParams(hidePostURL, hideParams)
-
-	req, RequestErr := RedditAPIRequest(POST, hideURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(hideURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -156,14 +131,9 @@ func (sess *Session) Lock(a interface{}) error {
 	lockParams := make(map[string]interface{})
 	lockParams["id"] = sess.getFullID(a)
 	lockURL := addParams(lockCommentPostURL, lockParams)
-	req, RequestErr := RedditAPIRequest(POST, lockURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(lockURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -173,14 +143,9 @@ func (sess *Session) MarkNSFW(a interface{}) error {
 	nsfwParams := make(map[string]interface{})
 	nsfwParams["id"] = sess.getFullID(a)
 	nsfwURL := addParams(markNsfwURL, nsfwParams)
-	req, RequestErr := RedditAPIRequest(POST, nsfwURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(nsfwURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -198,14 +163,9 @@ func (sess *Session) Report(a interface{}, reportParams map[string]interface{}) 
 	reportParams["thing_id"] = sess.getFullID(a)
 	reportingURL := addParams(reportURL, reportParams)
 
-	req, RequestErr := RedditAPIRequest(POST, reportingURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(reportingURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -215,15 +175,10 @@ func (sess *Session) Delete(a interface{}) error {
 	deleteParams := make(map[string]interface{})
 	deleteParams["id"] = sess.getFullID(a)
 	deleteURL := addParams(deleteCommentPostURL, deleteParams)
-	req, RequestErr := RedditAPIRequest(POST, deleteURL, nil)
 
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(deleteURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -240,14 +195,9 @@ func (sess *Session) Edit(a interface{}, editParams map[string]interface{}) erro
 	editParams["thing_id"] = sess.getFullID(a)
 	editURL := addParams(editCommentPostURL, editParams)
 
-	req, RequestErr := RedditAPIRequest(POST, editURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(editURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -264,14 +214,9 @@ func (sess *Session) Save(a interface{}, saveParams map[string]interface{}) erro
 
 	saveParams["id"] = sess.getFullID(a)
 	saveParamsURL := addParams(saveURL, saveParams)
-	req, RequestErr := RedditAPIRequest(POST, saveParamsURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(saveParamsURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -286,16 +231,10 @@ func (sess *Session) SetSubredditSticky(a interface{}, stickyParams map[string]i
 	}
 
 	stickyParams["id"] = sess.getFullID(a)
-
 	subStickyParamURL := addParams(setSubredditStickyURL, stickyParams)
-	req, RequestErr := RedditAPIRequest(POST, subStickyParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(subStickyParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -312,15 +251,9 @@ func (sess *Session) SetSuggestedSort(a interface{}, setSuggSortParams map[strin
 	}
 
 	setSuggSortParamURL := addParams(setSuggestedSortURL, setSuggSortParams)
-
-	req, RequestErr := RedditAPIRequest(POST, setSuggSortParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(setSuggSortParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -332,14 +265,9 @@ func (sess *Session) Spolier(a interface{}) error {
 
 	spoilerParamURL := addParams(spoilerURL, spoilerParams)
 
-	req, RequestErr := RedditAPIRequest(POST, spoilerParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(spoilerParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -350,14 +278,10 @@ func (sess *Session) StoreVists(links string) error {
 	storeVistsParams["links"] = links
 
 	storeVistsParamsURL := addParams(storeVisitsURL, storeVistsParams)
-	req, RequestErr := RedditAPIRequest(POST, storeVistsParamsURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
 
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(storeVistsParamsURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -373,14 +297,9 @@ func (sess *Session) Post(postParams map[string]interface{}) error {
 
 	postURL := addParams(submitURL, postParams)
 
-	req, RequestErr := RedditAPIRequest(POST, postURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return RequestErr
+	dataErr := sess.GetResponse(postURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -391,14 +310,10 @@ func (sess *Session) Unhide(a interface{}) error {
 	unhideParams["id"] = sess.getFullID(a)
 
 	unhideParamURL := addParams(unhidePostURL, unhideParams)
-	req, RequestErr := RedditAPIRequest(POST, unhideParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
 
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(unhideParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -410,14 +325,9 @@ func (sess *Session) Unlock(a interface{}) error {
 
 	unlockParamURL := addParams(unlockCommentPostURL, unlockParams)
 
-	req, RequestErr := RedditAPIRequest(POST, unlockParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(unlockParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -429,14 +339,9 @@ func (sess *Session) UnmarkNSFW(a interface{}) error {
 
 	unMarkNSFWURL := addParams(unmarkNsfwURL, unmarkNSFWParams)
 
-	req, RequestErr := RedditAPIRequest(POST, unMarkNSFWURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(unMarkNSFWURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -447,14 +352,10 @@ func (sess *Session) Unsave(a interface{}) error {
 	unsaveParams["id"] = sess.getFullID(a)
 
 	unsaveParamsURL := addParams(unSaveURL, unsaveParams)
-	req, RequestErr := RedditAPIRequest(POST, unsaveParamsURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
 
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(unsaveParamsURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -466,14 +367,9 @@ func (sess *Session) Unspoiler(a interface{}) error {
 
 	unspoilerParamsURL := addParams(unspoilerURL, unspoilerParams)
 
-	req, RequestErr := RedditAPIRequest(POST, unspoilerParamsURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(unspoilerParamsURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -485,14 +381,9 @@ func (sess *Session) Vote(a interface{}, vote int) error {
 	voteParams["dir"] = vote
 	voteParamURL := addParams(voteURL, voteParams)
 
-	req, RequestErr := RedditAPIRequest(POST, voteParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(voteParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil

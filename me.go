@@ -1,46 +1,30 @@
 package goddit
 
 func (sess *Session) MyData() (*Me, error) {
-	req, RequestErr := RedditAPIRequest(GET, MeURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var me Me
+	dataErr := sess.GetResponse(MeURL, GET, nil, &me)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	me := &Me{}
-	ResponseErr := sess.RedditAPIResponse(req, me)
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return me, nil
+	return &me, nil
 }
 
 func (sess *Session) MyPrefs() (*MePrefs, error) {
-	req, RequestErr := RedditAPIRequest(GET, MePrefURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var mePrefs MePrefs
+	dataErr := sess.GetResponse(MePrefURL, GET, nil, &mePrefs)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	mePrefs := &MePrefs{}
-	ResponseErr := sess.RedditAPIResponse(req, mePrefs)
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return mePrefs, nil
+	return &mePrefs, nil
 }
 
 func (sess *Session) MyKarma() ([]KarmaData, error) {
-	req, RequestErr := RedditAPIRequest(GET, MeKarmaURL, nil)
-
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	meKarma := &MeKarma{}
-	ResponseErr := sess.RedditAPIResponse(req, meKarma)
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var meKarma MeKarma
+	dataErr := sess.GetResponse(MeKarmaURL, GET, nil, &meKarma)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	karmaData := []KarmaData{}
@@ -52,20 +36,14 @@ func (sess *Session) MyKarma() ([]KarmaData, error) {
 }
 
 func (sess *Session) MyTrophies() ([]Trophie, error) {
-	req, RequestErr := RedditAPIRequest(GET, MeTrophieURL, nil)
-
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	trophieStruct := &GetTrophies{}
-	ResponseErr := sess.RedditAPIResponse(req, trophieStruct)
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getTrophies GetTrophies
+	dataErr := sess.GetResponse(MeTrophieURL, GET, nil, &getTrophies)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	trophies := []Trophie{}
-	for _, trophieget := range trophieStruct.Data.TrophieList {
+	for _, trophieget := range getTrophies.Data.TrophieList {
 		trophies = append(trophies, trophieget.Data)
 	}
 

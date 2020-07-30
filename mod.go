@@ -15,19 +15,14 @@ func (sess *Session) ModLog(subreddit string, modParams map[string]interface{}) 
 	modLogURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, modLogEnding)
 	modLogURL = addParams(modLogURL, modParams)
 
-	req, RequestErr := RedditAPIRequest(GET, modLogURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	modLogJSON := &GetModLog{}
-	ResponseErr := sess.RedditAPIResponse(req, modLogJSON)
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getModLog GetModLog
+	dataErr := sess.GetResponse(modLogURL, GET, nil, &getModLog)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	var modLog []ModLog
-	for _, modLogObject := range modLogJSON.Data.Children {
+	for _, modLogObject := range getModLog.Data.Children {
 		modLog = append(modLog, modLogObject.Data)
 	}
 
@@ -39,14 +34,10 @@ func (sess *Session) Approve(a interface{}) error {
 	approveParams["id"] = sess.getFullID(a)
 
 	approveParamURL := addParams(approveURL, approveParams)
-	req, RequestErr := RedditAPIRequest(POST, approveParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
 
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(approveParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -58,14 +49,9 @@ func (sess *Session) AcceptModInvite(subreddit string) error {
 
 	acceptModURL := fmt.Sprintf("%s/%s%s", SubredditURL, subreddit, acceptModEnding)
 	acceptModURL = addParams(acceptModURL, acceptModParams)
-	req, RequestErr := RedditAPIRequest(POST, acceptModURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(acceptModURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -77,14 +63,9 @@ func (sess *Session) Remove(a interface{}, spam bool) error {
 	removeParams["spam"] = spam
 
 	removeParamURL := addParams(removeURL, removeParams)
-	req, RequestErr := RedditAPIRequest(POST, removeParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(removeParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil
@@ -96,14 +77,9 @@ func (sess *Session) ShowComment(c Comment) error {
 
 	showCommentParamURL := addParams(showCommentURL, showCommentParams)
 
-	req, RequestErr := RedditAPIRequest(POST, showCommentParamURL, nil)
-	if RequestErr != nil {
-		return RequestErr
-	}
-
-	ResponseErr := sess.RedditAPIResponse(req, nil)
-	if ResponseErr != nil {
-		return ResponseErr
+	dataErr := sess.GetResponse(showCommentParamURL, POST, nil, nil)
+	if dataErr != nil {
+		return dataErr
 	}
 
 	return nil

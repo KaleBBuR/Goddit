@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -315,11 +314,11 @@ type Session struct {
 	expiretime   float64
 }
 
-func RedditAPIRequest(method string, url string, post_data url.Values) (*http.Request, error) {
+func RedditAPIRequest(method string, url string, post_data []byte) (*http.Request, error) {
 	var request *http.Request
 	var err error
 	if post_data != nil {
-		request, err = http.NewRequest(method, url, bytes.NewBufferString(post_data.Encode()))
+		request, err = http.NewRequest(method, url, bytes.NewBuffer(post_data))
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("HTTP Request error. URL: %s\nMethod:%s\nHost:%s\n", request.URL, request.Method, request.Host))
 		}
@@ -368,9 +367,6 @@ func (sess *Session) RedditAPIResponse(request *http.Request, a interface{}) err
 	if err != nil {
 		return err
 	}
-
-	// b, _ := printJSON(body)
-	// fmt.Printf("%s", b)
 
 	if JSONerr := json.Unmarshal(body, a); JSONerr != nil && a != nil {
 		return err
@@ -421,6 +417,20 @@ func addParams(url string, params map[string]interface{}) string {
 
 	url = strings.TrimSuffix(url, "&")
 	return url
+}
+
+func (sess *Session) GetResponse(url string, method string, body []byte, a interface{}) error {
+	req, RequestErr := RedditAPIRequest(method, url, body)
+	if RequestErr != nil {
+		return RequestErr
+	}
+
+	ResponseErr := sess.RedditAPIResponse(req, a)
+	if ResponseErr != nil {
+		return ResponseErr
+	}
+
+	return nil
 }
 
 const (

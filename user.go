@@ -6,36 +6,26 @@ import (
 
 func (sess *Session) UserAbout(user string) (*User, error) {
 	userAboutURL := fmt.Sprintf("%s/%s%s", UserURL, user, aboutEnding)
-	req, RequestErr := RedditAPIRequest(GET, userAboutURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+
+	var getUser GetUser
+	dataErr := sess.GetResponse(userAboutURL, GET, nil, &getUser)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	userAboutJson := &GetUser{}
-	ResponseErr := sess.RedditAPIResponse(req, userAboutJson)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return &userAboutJson.Data, nil
+	return &getUser.Data, nil
 }
 
 func (sess *Session) UserTrophies(user string) ([]Trophie, error) {
 	userTrophiesURL := fmt.Sprintf("%s/%s%s", User2URL, user, trophiesEnding)
-	req, RequestErr := RedditAPIRequest(GET, userTrophiesURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	trophiesStruct := &GetTrophies{}
-	ResponseErr := sess.RedditAPIResponse(req, trophiesStruct)
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getTrophies GetTrophies
+	dataErr := sess.GetResponse(userTrophiesURL, GET, nil, &getTrophies)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	var trophies []Trophie
-	for _, trophieObject := range trophiesStruct.Data.TrophieList {
+	for _, trophieObject := range getTrophies.Data.TrophieList {
 		trophies = append(trophies, trophieObject.Data)
 	}
 
@@ -44,37 +34,25 @@ func (sess *Session) UserTrophies(user string) ([]Trophie, error) {
 
 func (sess *Session) UserFriends(user string) ([]FriendData, error) {
 	userFriendsURL := fmt.Sprintf("%s/%s", UserFriendsBeginning, user)
-	req, RequestErr := RedditAPIRequest(GET, userFriendsURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
+	var friendData []FriendData
+	dataErr := sess.GetResponse(userFriendsURL, GET, nil, friendData)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
-	friends := []FriendData{}
-	ResponseErr := sess.RedditAPIResponse(req, friends)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
-	}
-
-	return friends, nil
+	return friendData, nil
 }
 
 func (sess *Session) UserComments(user string) ([]Comment, error) {
 	userCommentsURL := fmt.Sprintf("%s/%s%s", UserURL, user, commentsEnding)
-	req, RequestErr := RedditAPIRequest(GET, userCommentsURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	commentData := &GetCommentJSON{}
-	ResponseErr := sess.RedditAPIResponse(req, commentData)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getCommentJSON GetCommentJSON
+	dataErr := sess.GetResponse(userCommentsURL, GET, nil, &getCommentJSON)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	comments := []Comment{}
-	for _, commentStruct := range commentData.Data.Children {
+	for _, commentStruct := range getCommentJSON.Data.Children {
 		comments = append(comments, commentStruct.CommentData)
 	}
 
@@ -83,20 +61,14 @@ func (sess *Session) UserComments(user string) ([]Comment, error) {
 
 func (sess *Session) UserPosts(user string) ([]Submission, error) {
 	userPostsURL := fmt.Sprintf("%s/%s%s", UserURL, user, postsEnding)
-	req, RequestErr := RedditAPIRequest(GET, userPostsURL, nil)
-	if RequestErr != nil {
-		return nil, RequestErr
-	}
-
-	submissionsStruct := &GetSubmission{}
-	ResponseErr := sess.RedditAPIResponse(req, submissionsStruct)
-
-	if ResponseErr != nil {
-		return nil, ResponseErr
+	var getSubmission GetSubmission
+	dataErr := sess.GetResponse(userPostsURL, GET, nil, &getSubmission)
+	if dataErr != nil {
+		return nil, dataErr
 	}
 
 	submissions := []Submission{}
-	for _, submissionData := range submissionsStruct.Data.Children {
+	for _, submissionData := range getSubmission.Data.Children {
 		submissions = append(submissions, submissionData.Data)
 	}
 
